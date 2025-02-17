@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:leanware_assessment/pages/call_page.dart';
 import 'package:leanware_assessment/pages/login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,7 +40,27 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Column(
-        children: const [Text('home')],
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => CallPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: Colors.purple,
+            ),
+            child: const Text(
+              "Join Call",
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
