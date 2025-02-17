@@ -49,7 +49,10 @@ class _CallPageState extends State<CallPage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: kIsWeb
             ? AppBar(
-                title: Text(controller.roomId),
+                title: Text(
+                  'Room Id: ${controller.roomId}',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 automaticallyImplyLeading: false,
               )
             : null,
@@ -142,11 +145,11 @@ class _CallPageState extends State<CallPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        controller.roomId,
+                        'Room Id: ${controller.roomId}',
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                        ),
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
                       ),
                       StreamBuilder<Duration>(
                         stream: controller.elapsedTimeStream,
@@ -173,7 +176,8 @@ class _CallPageState extends State<CallPage> {
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.grey[100]?.withOpacity(0.3),
+                            color: const Color.fromARGB(255, 99, 99, 99)
+                                .withOpacity(0.3),
                           ),
                           child: Row(
                             children: [

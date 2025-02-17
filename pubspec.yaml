@@ -19,6 +19,7 @@ dependencies:
   native_device_orientation: ^2.0.3
   intl: ^0.20.2
   firebase_auth_mocks: ^0.14.1
+  cloud_firestore: ^5.6.3
 
 dev_dependencies:
   flutter_test:
