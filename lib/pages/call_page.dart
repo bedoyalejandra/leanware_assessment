@@ -199,6 +199,48 @@ class _CallPageState extends State<CallPage> {
                 ],
               ),
             ),
+            Positioned(
+              bottom: orientation == NativeDeviceOrientation.portraitUp
+                  ? 150 + bottomPadding
+                  : 10,
+              right: orientation == NativeDeviceOrientation.portraitUp
+                  ? 10
+                  : orientation == NativeDeviceOrientation.landscapeRight
+                      ? controllersHeight + MediaQuery.of(context).padding.left
+                      : controllersHeight,
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: controller.switchOnBlur,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 159, 159, 159)!
+                                .withOpacity(0.5),
+                            blurRadius: 2,
+                            offset: const Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          controller.blurBackground
+                              ? Icons.blur_off
+                              : Icons.blur_on,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             if (orientation == NativeDeviceOrientation.portraitUp)
               _bottomControls(buttonSize)
             else
@@ -338,6 +380,7 @@ class _CallPageState extends State<CallPage> {
               cameraButton(controller, buttonSize),
               muteButton(controller, buttonSize),
               flipButton(controller, buttonSize),
+              // blurButton(controller, buttonSize),
               hangUpButton(controller, buttonSize),
             ],
           ),

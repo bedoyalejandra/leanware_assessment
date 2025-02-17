@@ -103,6 +103,31 @@ Widget flipButton(CallController controller, double size) => Column(
       ],
     );
 
+Widget blurButton(CallController controller, double size) => Column(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 120, 120, 120),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(
+              size: size * 0.6,
+              controller.blurBackground ? Icons.blur_off : Icons.blur_on,
+              color: Colors.white,
+            ),
+            onPressed: controller.switchOnBlur,
+          ),
+        ),
+        Text(
+          !controller.blurBackground ? 'Blur' : 'Unblur',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ],
+    );
+
 Widget hangUpButton(CallController controller, double size) => Column(
       children: [
         Container(

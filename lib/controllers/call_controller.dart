@@ -27,6 +27,7 @@ class CallController {
   int? remoteUid;
   bool localUserJoined = false;
   bool isSmallVideoLocal = true;
+  bool blurBackground = false;
 
   bool showWarning = false;
   String warning = '';
@@ -190,6 +191,42 @@ class CallController {
   void switchVideos() {
     isSmallVideoLocal = !isSmallVideoLocal;
     refresh();
+  }
+
+  void switchOnBlur() {
+    blurBackground = !blurBackground;
+    if (blurBackground) {
+      setBlurBackground();
+    } else {
+      resetVirtualBackground();
+    }
+    refresh();
+  }
+
+  Future<void> setBlurBackground() async {
+    final virtualBackgroundSource = const VirtualBackgroundSource(
+      backgroundSourceType: BackgroundSourceType.backgroundBlur,
+      blurDegree: BackgroundBlurDegree.blurDegreeHigh,
+    );
+
+    final segmentationProperty = const SegmentationProperty(
+      modelType: SegModelType.segModelAi,
+      greenCapacity: 0.5,
+    );
+
+    engine.enableVirtualBackground(
+      enabled: true,
+      backgroundSource: virtualBackgroundSource,
+      segproperty: segmentationProperty,
+    );
+  }
+
+  Future<void> resetVirtualBackground() async {
+    engine.enableVirtualBackground(
+      enabled: false,
+      backgroundSource: VirtualBackgroundSource(),
+      segproperty: SegmentationProperty(),
+    );
   }
 
   Future<void> endCall() async {
