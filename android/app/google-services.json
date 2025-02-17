@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214026565751",
+    "project_id": "leanware-assessment",
+    "storage_bucket": "leanware-assessment.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214026565751:android:145ff2346fc0715e20ee72",
+        "android_client_info": {
+          "package_name": "com.example.leanware_assessment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIhv_tVZc43OhsQpdfSONaxt921fvZX94"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
