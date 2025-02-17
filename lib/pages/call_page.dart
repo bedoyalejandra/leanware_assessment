@@ -1,140 +1,115 @@
-import 'dart:async';
-
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-const appId = "a879f008f7cb4f20bc42bab4e87ca6c4";
-const token = "";
-const channel = "test-channel";
+import '../controllers/call_controller.dart';
+import '../widgets/call_controlls.dart';
 
 class CallPage extends StatefulWidget {
-  const CallPage({Key? key}) : super(key: key);
+  const CallPage({this.roomId, Key? key}) : super(key: key);
+  final String? roomId;
 
   @override
   State<CallPage> createState() => _CallPageState();
 }
 
 class _CallPageState extends State<CallPage> {
-  int? _remoteUid;
-  bool _localUserJoined = false;
-  late RtcEngine _engine;
+  CallController controller = CallController();
 
   @override
   void initState() {
     super.initState();
-    initAgora();
-  }
-
-  Future<void> initAgora() async {
-    await [Permission.microphone, Permission.camera].request();
-
-    _engine = createAgoraRtcEngine();
-    await _engine.initialize(const RtcEngineContext(
-      appId: appId,
-      channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
-    ));
-
-    _engine.registerEventHandler(
-      RtcEngineEventHandler(
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          debugPrint("local user ${connection.localUid} joined");
-          setState(() {
-            _localUserJoined = true;
-          });
-        },
-        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          debugPrint("remote user $remoteUid joined");
-          setState(() {
-            _remoteUid = remoteUid;
-          });
-        },
-        onUserOffline: (RtcConnection connection, int remoteUid,
-            UserOfflineReasonType reason) {
-          debugPrint("remote user $remoteUid left channel");
-          setState(() {
-            _remoteUid = null;
-          });
-        },
-        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
-          debugPrint(
-              '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
-        },
-      ),
-    );
-
-    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-    await _engine.enableVideo();
-    await _engine.startPreview();
-
-    await _engine.joinChannel(
-      token: token,
-      channelId: channel,
-      uid: 0,
-      options: const ChannelMediaOptions(),
-    );
+    controller.init(refresh, roomId: widget.roomId);
   }
 
   @override
   void dispose() {
     super.dispose();
-
-    _dispose();
-  }
-
-  Future<void> _dispose() async {
-    await _engine.leaveChannel();
-    await _engine.release();
+    controller.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Agora Video Call'),
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: _remoteVideo(),
-          ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 100,
-              height: 150,
-              child: Center(
-                child: _localUserJoined
-                    ? AgoraVideoView(
-                        controller: VideoViewController(
-                          rtcEngine: _engine,
-                          canvas: const VideoCanvas(uid: 0),
-                        ),
-                      )
-                    : const CircularProgressIndicator(),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(controller.roomId ?? ''),
+          automaticallyImplyLeading: false,
+        ),
+        body: Stack(
+          children: [
+            Center(
+              child: _remoteVideo(),
+            ),
+            Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 100,
+                height: 150,
+                child: Center(
+                  child: controller.localUserJoined
+                      ? AgoraVideoView(
+                          controller: VideoViewController(
+                            rtcEngine: controller.engine,
+                            canvas: const VideoCanvas(uid: 0),
+                          ),
+                        )
+                      : const CircularProgressIndicator(),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            _bottomControls(50),
+          ],
+        ),
+      );
 
   // Display remote user's video
   Widget _remoteVideo() {
-    if (_remoteUid != null) {
+    if (controller.remoteUid != null) {
       return AgoraVideoView(
         controller: VideoViewController.remote(
-          rtcEngine: _engine,
-          canvas: VideoCanvas(uid: _remoteUid),
-          connection: const RtcConnection(channelId: channel),
+          rtcEngine: controller.engine,
+          canvas: VideoCanvas(uid: controller.remoteUid),
+          connection: RtcConnection(channelId: controller.roomId),
         ),
       );
     } else {
       return const Text(
-        'Please wait for remote user to join',
+        'Waiting for another user',
         textAlign: TextAlign.center,
       );
+    }
+  }
+
+  Widget _bottomControls(double buttonSize) => Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: const EdgeInsets.only(top: 25, bottom: 10),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 99, 99, 99),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                speakerButton(controller, buttonSize),
+                cameraButton(controller, buttonSize),
+                muteButton(controller, buttonSize),
+                flipButton(controller, buttonSize),
+                hangUpButton(controller, buttonSize),
+              ],
+            ),
+          ),
+        ),
+      );
+
+  void refresh() {
+    if (mounted) {
+      setState(() {});
     }
   }
 }
