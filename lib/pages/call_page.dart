@@ -56,12 +56,16 @@ class _CallPageState extends State<CallPage> {
         body: kIsWeb ? _webLayout() : _mobileLayout(),
       );
 
-  // Diseño para web: Los videos ocupan toda la pantalla uno al lado del otro.
   Widget _webLayout() {
-    return Row(
+    return Stack(
       children: [
-        Expanded(child: _localVideo()),
-        Expanded(child: _remoteVideo()),
+        Row(
+          children: [
+            Expanded(child: _localVideo()),
+            Expanded(child: _remoteVideo()),
+          ],
+        ),
+        _floatingControls(),
       ],
     );
   }
@@ -311,6 +315,36 @@ class _CallPageState extends State<CallPage> {
           ),
         ),
       );
+
+  Widget _floatingControls() {
+    double buttonSize = screenWidth * 0.13;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 20),
+        height: 100,
+        width: MediaQuery.of(context).size.width * 0.5,
+        padding: const EdgeInsets.only(top: 25, bottom: 10),
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 100, 100, 100),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              speakerButton(controller, buttonSize),
+              cameraButton(controller, buttonSize),
+              muteButton(controller, buttonSize),
+              flipButton(controller, buttonSize),
+              hangUpButton(controller, buttonSize),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   // Adjust the small video position when the orientation changes
   void _updateVideoPositionForNewOrientation(
