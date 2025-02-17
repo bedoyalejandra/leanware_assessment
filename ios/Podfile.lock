@@ -101,6 +101,8 @@ PODS:
   - GTMSessionFetcher/Core (4.3.0)
   - iris_method_channel (0.0.1):
     - Flutter
+  - native_device_orientation (0.0.1):
+    - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
   - RecaptchaInterop (100.0.0)
@@ -111,6 +113,7 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - iris_method_channel (from `.symlinks/plugins/iris_method_channel/ios`)
+  - native_device_orientation (from `.symlinks/plugins/native_device_orientation/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 SPEC REPOS:
@@ -140,6 +143,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   iris_method_channel:
     :path: ".symlinks/plugins/iris_method_channel/ios"
+  native_device_orientation:
+    :path: ".symlinks/plugins/native_device_orientation/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
@@ -161,6 +166,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   GTMSessionFetcher: 257ead9ba8e15a2d389d79496e02b9cc5dd0c62c
   iris_method_channel: 0617c689164d8154c020c50f63ca79f92b8a7b9d
+  native_device_orientation: 348b10c346a60ebbc62fb235a4fdb5d1b61a8f55
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
 

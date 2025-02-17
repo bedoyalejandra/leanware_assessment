@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -25,6 +26,15 @@ class CallController {
 
   int? remoteUid;
   bool localUserJoined = false;
+  bool isSmallVideoLocal = true;
+
+  bool showWarning = false;
+  String warning = '';
+
+  Timer? _timer;
+  Duration elapsedTime = Duration.zero;
+  StreamController<Duration>? _elapsedTimeController;
+  Stream<Duration>? get elapsedTimeStream => _elapsedTimeController?.stream;
 
   void init(
     Function refresh, {
@@ -32,6 +42,7 @@ class CallController {
   }) {
     this.refresh = refresh;
     this.roomId = roomId ?? generateRoomId().toString();
+    _elapsedTimeController = StreamController<Duration>.broadcast();
 
     FirebaseAuth auth = FirebaseAuth.instance;
     user = auth.currentUser;
@@ -83,11 +94,13 @@ class CallController {
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           debugPrint('local user ${connection.localUid} joined');
           localUserJoined = true;
+          _startTimer();
           refresh();
         },
         onUserJoined: (RtcConnection connection, int? remoteUid, int elapsed) {
           debugPrint('remote user $remoteUid joined');
           this.remoteUid = remoteUid;
+          isSmallVideoLocal = false;
           refresh();
         },
         onUserOffline: (RtcConnection connection, int? remoteUid,
@@ -103,6 +116,40 @@ class CallController {
         },
       ),
     );
+  }
+
+  void _startTimer() {
+    final startTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      var now = DateTime.now();
+      var difference = now.difference(startTime);
+      elapsedTime = difference;
+      _elapsedTimeController?.add(elapsedTime);
+      refresh();
+
+      if (difference.inHours >= 1) {
+        _timer?.cancel();
+
+        _timer = Timer.periodic(const Duration(minutes: 1), (Timer timer) {
+          var now = DateTime.now();
+          elapsedTime = now.difference(startTime!);
+          _elapsedTimeController?.add(elapsedTime);
+          refresh();
+        });
+      }
+    });
+  }
+
+  void _showTemporaryWarning(String message) {
+    warning = message;
+    showWarning = true;
+
+    Future.delayed(const Duration(seconds: 10), () {
+      if (warning == message) {
+        showWarning = false;
+        warning = '';
+      }
+    });
   }
 
   Future<void> toggleMic() async {
@@ -140,7 +187,18 @@ class CallController {
     refresh();
   }
 
+  void switchVideos() {
+    isSmallVideoLocal = !isSmallVideoLocal;
+    refresh();
+  }
+
   Future<void> endCall() async {
+    isSmallVideoLocal = false;
+    showWarning = false;
+    warning = '';
+    elapsedTime = Duration.zero;
+    _elapsedTimeController?.close();
+
     await engine.leaveChannel();
 
     NavigationService.instance.goBack();
