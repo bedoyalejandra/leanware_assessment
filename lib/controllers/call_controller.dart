@@ -156,7 +156,10 @@ class CallController {
 
   Future<void> createRoom() async {
     DocumentReference roomRef = db.collection('Rooms').doc(roomId);
-    await roomRef.set({'status': 'created'});
+    await roomRef.set({
+      'status': 'created',
+      'creator': userId,
+    });
     getRoomDetails(roomId);
     startTimeOutTimer();
   }
