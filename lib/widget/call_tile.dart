@@ -15,14 +15,16 @@ class CallTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         call.incoming ? Icons.call_received : Icons.call_made,
-        color: call.incoming ? Colors.purple.shade700 : Colors.purple.shade400,
+        color: call.incoming
+            ? Colors.deepPurple.shade700
+            : Colors.deepPurple.shade400,
       ),
       title: Text(call.id ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text("Duración: ${formatSeconds(call.duration)}"),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.access_time_outlined, color: Colors.purple),
+          Icon(Icons.access_time_outlined, color: Colors.deepPurple),
           Text(getRelativeTime(call.date),
               style: TextStyle(color: Colors.grey)),
         ],

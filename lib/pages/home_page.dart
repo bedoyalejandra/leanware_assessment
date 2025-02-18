@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:leanware_assessment/models/call_history.dart';
@@ -64,113 +65,131 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple.shade50,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Home Page'),
+        backgroundColor: Colors.deepPurple,
+        title: const Text('Home Page', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app, color: Colors.white),
             onPressed: _logout,
           ),
         ],
       ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: textEditingController,
-                decoration: InputDecoration(
-                    hintText: "RoomId",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(18),
-                        borderSide: BorderSide.none),
-                    fillColor: Colors.purple.withOpacity(0.1),
-                    filled: true,
-                    prefixIcon: const Icon(Icons.key)),
-              ),
-              if (message.isNotEmpty) errorMessageWidget(context, message),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                      builder: (BuildContext context) => CallPage(),
+          padding: const EdgeInsets.all(20),
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: kIsWeb
+                  ? Row(
+                      children: [
+                        Expanded(child: _buildJoinForm()),
+                        SizedBox(width: 20),
+                        Expanded(child: _buildHistory()),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildJoinForm(),
+                        SizedBox(height: 20),
+                        Expanded(child: _buildHistory()),
+                      ],
                     ),
-                  ).then((_) {
-                    _getCallHistory();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.purple,
-                ),
-                child: const Text(
-                  "Create Room",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (textEditingController.text.isEmpty) {
-                    setState(() {
-                      message = 'Please enter a room Id';
-                    });
-                    return;
-                  }
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                      builder: (BuildContext context) => CallPage(
-                        roomId: textEditingController.text,
-                      ),
-                    ),
-                  ).then((_) {
-                    _getCallHistory();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.purple,
-                ),
-                child: const Text(
-                  "Join Room",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              // Mostrar el historial de llamadas
-              Expanded(
-                child: ListView.builder(
-                  itemCount: callHistory.length,
-                  itemBuilder: (context, index) {
-                    final call = callHistory[index];
-                    return CallTile(call: call);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  _buildJoinForm() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: textEditingController,
+          decoration: InputDecoration(
+              hintText: "Enter Room ID",
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none),
+              fillColor: Colors.deepPurple.shade100,
+              filled: true,
+              prefixIcon: const Icon(Icons.vpn_key, color: Colors.deepPurple)),
+        ),
+        if (message.isNotEmpty) errorMessageWidget(context, message),
+        const SizedBox(height: 15),
+        _buildButton("Create Room", () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute<dynamic>(
+              builder: (BuildContext context) => CallPage(),
+            ),
+          ).then((_) {
+            _getCallHistory();
+          });
+        }),
+        const SizedBox(height: 10),
+        _buildButton("Join Room", () async {
+          if (textEditingController.text.isEmpty) {
+            setState(() {
+              message = 'Please enter a room Id';
+            });
+            return;
+          }
+          await Navigator.push(
+            context,
+            MaterialPageRoute<dynamic>(
+              builder: (BuildContext context) => CallPage(
+                roomId: textEditingController.text,
+              ),
+            ),
+          ).then((_) {
+            _getCallHistory();
+          });
+        }),
+      ],
+    );
+  }
+
+  Widget _buildButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        backgroundColor: Colors.deepPurple,
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+            fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildHistory() {
+    if (callHistory.isEmpty) {
+      return Center(
+        child: Text(
+          'No call history available',
+          style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+        ),
+      );
+    }
+    return ListView.builder(
+      itemCount: callHistory.length,
+      itemBuilder: (context, index) {
+        final call = callHistory[index];
+        return CallTile(call: call);
+      },
     );
   }
 }
