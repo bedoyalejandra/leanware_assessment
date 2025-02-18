@@ -49,9 +49,61 @@ class _CallPageState extends State<CallPage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: kIsWeb
             ? AppBar(
-                title: Text(
-                  'Room Id: ${controller.roomId}',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Room Id: ${controller.roomId}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    StreamBuilder<Duration>(
+                      stream: controller.elapsedTimeStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            formatDuration(snapshot.data!),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
+                    ),
+                    if (controller.showWarning)
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.4),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning,
+                              color: Colors.yellow,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              controller.warning,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
                 automaticallyImplyLeading: false,
               )
