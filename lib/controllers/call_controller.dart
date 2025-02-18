@@ -4,6 +4,8 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:leanware_assessment/models/call_history.dart';
+import 'package:leanware_assessment/providers/call_history_provider.dart';
 import 'package:leanware_assessment/services/navigation_service.dart';
 import 'package:leanware_assessment/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -47,6 +49,8 @@ class CallController {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  CallHistoryProvider? callHistoryProvider;
+
   void init(
     Function refresh, {
     String? roomId,
@@ -58,6 +62,7 @@ class CallController {
     user = auth.currentUser;
     if (user != null) {
       userId = user!.uid;
+      callHistoryProvider = CallHistoryProvider(userId);
     }
 
     startCall(roomId);
@@ -372,7 +377,7 @@ class CallController {
   Future<void> endCall() async {
     DocumentReference roomRef = db.collection('Rooms').doc(roomId);
     await roomRef.update({'status': 'ended', 'endTime': DateTime.now()});
-
+    voidSaveCallRecord();
     isSmallVideoLocal = false;
     showWarning = false;
     warning = '';
@@ -386,5 +391,34 @@ class CallController {
     await engine.release();
 
     NavigationService.instance.goBack();
+  }
+
+  Future<void> voidSaveCallRecord() async {
+    DocumentReference roomRef = db.collection('Rooms').doc(roomId);
+    DocumentSnapshot roomSnapshot = await roomRef.get();
+
+    if (!roomSnapshot.exists) return;
+
+    Map<String, dynamic>? roomData =
+        roomSnapshot.data() as Map<String, dynamic>?;
+
+    if (roomData == null ||
+        !roomData.containsKey('startTime') ||
+        !roomData.containsKey('endTime')) {
+      return;
+    }
+
+    DateTime startTime = (roomData['startTime'] as Timestamp).toDate();
+    DateTime endTime = (roomData['endTime'] as Timestamp).toDate();
+
+    Duration duration = endTime.difference(startTime);
+
+    CallHistoryModel callHistory = CallHistoryModel(
+      incoming: roomData['creator'] != userId,
+      date: startTime,
+      duration: duration.inSeconds,
+    );
+
+    await callHistoryProvider?.saveRecord(roomId, callHistory);
   }
 }
