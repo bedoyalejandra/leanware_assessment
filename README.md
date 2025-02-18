@@ -1,16 +1,19 @@
-# leanware_assessment
+# Leanware Assessment
 
-A new Flutter project.
+This is the repository for the **Leanware Assessment** project. Below are the instructions on how to deploy and run the project locally.
 
-## Getting Started
+## Requirements
 
-This project is a starting point for a Flutter application.
+Before getting started, make sure you have the following installed on your local machine:
 
-A few resources to get you started if this is your first Flutter project:
+- [Flutter](https://flutter.dev/docs/get-started/install) (recommended version  3.27.4)
+- [Dart](https://dart.dev/get-dart)
+- [Xcode](https://developer.apple.com/xcode/) (macOS only)
+- [Android Studio](https://developer.android.com/studio) or any other editor that supports Flutter.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Cloning the Repository
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+First, clone this repository to your local machine:
+
+```bash
+git clone https://github.com/your-username/leanware_assessment.git
