@@ -10,11 +10,9 @@ void main() {
   testWidgets('Empty fields show error message', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignupPage()));
 
-    // Tap the "Sign up" button without entering any text
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    // Check if the error message for empty fields appears
     expect(find.text('All fields are required'), findsOneWidget);
   });
 
@@ -22,14 +20,11 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignupPage()));
 
-    // Enter an invalid email format
     await tester.enterText(find.byType(TextField).first, 'invalidemail.com');
 
-    // Tap the "Sign up" button
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    // Check if the error message for invalid email format appears
     expect(find.text('Enter a valid email address'), findsOneWidget);
   });
 
@@ -37,20 +32,15 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignupPage()));
 
-    // Enter a valid email
     await tester.enterText(find.byType(TextField).first, 'test@example.com');
 
-    // Enter a short password
     await tester.enterText(find.byType(TextField).at(1), '12345');
 
-    // Enter a matching confirm password
     await tester.enterText(find.byType(TextField).at(2), '12345');
 
-    // Tap the "Sign up" button
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    // Check if the error message for short password appears
     expect(find.text('Password must be at least 6 characters'), findsOneWidget);
   });
 
@@ -58,27 +48,21 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignupPage()));
 
-    // Enter a valid email
     await tester.enterText(find.byType(TextField).first, 'test@example.com');
 
-    // Enter a valid password
     await tester.enterText(find.byType(TextField).at(1), 'password123');
 
-    // Enter a different password in confirm password field
     await tester.enterText(
         find.byType(TextField).at(2), 'differentpassword123');
 
-    // Tap the "Sign up" button
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    // Check if the error message for password mismatch appears
     expect(find.text('Passwords do not match'), findsOneWidget);
   });
 
   testWidgets('Successful signup navigates to HomePage',
       (WidgetTester tester) async {
-    // Mock the FirebaseAuth instance for successful signup
     final mockFirebaseAuth = MockFirebaseAuth();
     final mockUserCredential = MockUserCredential();
 
