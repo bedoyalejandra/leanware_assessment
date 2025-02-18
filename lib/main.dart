@@ -1,16 +1,22 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:leanware_assessment/firebase_options.dart';
 import 'package:leanware_assessment/pages/login_page.dart';
 import 'package:leanware_assessment/pages/home_page.dart';
 import 'package:leanware_assessment/services/navigation_service.dart';
+import 'package:leanware_assessment/services/notification_service.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await NotificationService.initialize(flutterLocalNotificationsPlugin);
+
   runApp(const MyApp());
 }
 

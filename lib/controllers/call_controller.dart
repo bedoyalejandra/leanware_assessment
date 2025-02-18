@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:leanware_assessment/services/navigation_service.dart';
+import 'package:leanware_assessment/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -41,6 +43,9 @@ class CallController {
 
   StreamSubscription<DocumentSnapshot>? _callStatusSubscription;
   FirebaseFirestore db = FirebaseFirestore.instance;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   void init(
     Function refresh, {
@@ -115,6 +120,13 @@ class CallController {
           debugPrint('remote user $remoteUid joined');
           this.remoteUid = remoteUid;
           isSmallVideoLocal = false;
+
+          NotificationService.showBigTextNotification(
+            title: 'Someone joined',
+            body: 'Your call has started',
+            fln: flutterLocalNotificationsPlugin,
+          );
+
           refresh();
         },
         onUserOffline: (RtcConnection connection, int? remoteUid,
@@ -225,7 +237,7 @@ class CallController {
     var roomSnapshot = await roomRef.get();
 
     if (roomSnapshot.exists) {
-      await roomRef.update({'status': 'accepted', 'startTime': DateTime.now()});
+      await roomRef.update({'status': 'started', 'startTime': DateTime.now()});
       getRoomDetails(roomId);
     } else {
       BuildContext? context = NavigationService.instance.getContext();
